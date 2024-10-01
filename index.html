@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Index</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet"> <!-- Dodavanje Roboto fonta -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         /* Osigurajmo da se #referral-info prikazuje */
@@ -88,11 +88,14 @@
     <script>
         const shareIcon = document.getElementById('share-icon');
 
+        // Pretpostavljamo da korisničko ime dolazi iz URL parametara ili je već definirano
+        const { username: userParam } = getQueryParams();
+
         // Funkcija za nativno dijeljenje
         shareIcon.addEventListener('click', async () => {
             const shareData = {
                 title: 'Poziv za pridruživanje',
-                text: 'Zdravo, pridruži mi se na https://nftnox.github.io/pi5/registracija.html'
+                text: `Zdravo, pridruži mi se na https://nftnox.github.io/pi5/registracija.html. Moj kod je ${userParam}`
             };
 
             try {
@@ -102,6 +105,16 @@
                 console.error('Greška prilikom dijeljenja:', err);
             }
         });
+
+        // Funkcija za dobijanje parametara iz URL-a
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                ime: params.get('ime'),
+                prezime: params.get('prezime'),
+                username: params.get('username')
+            };
+        }
     </script>
 
     <script type="module">
@@ -128,18 +141,6 @@
 
         const MAX_REFERRALS = 10; // Maksimalan broj korisnika koji mogu koristiti isti referralCode
 
-        // Funkcija za dobijanje parametara iz URL-a
-        function getQueryParams() {
-            const params = new URLSearchParams(window.location.search);
-            return {
-                ime: params.get('ime'),
-                prezime: params.get('prezime'),
-                username: params.get('username')
-            };
-        }
-
-        const { username: userParam } = getQueryParams(); // Dobijanje username iz URL-a
-
         async function loadUserId() {
             const userCollection = collection(db, 'network');
             const q = query(userCollection, where("username", "==", userParam));
@@ -151,9 +152,7 @@
                     const userData = doc.data();
                     document.getElementById('ime').innerText = userData.ime; // Prikazivanje imena korisnika
                     
-                    // Provjera da li novi korisnik ima referral kod
                     if (userData.referralCode) {
-                        // Provjera da li taj referralCode odgovara nekom korisniku
                         checkReferral(userData.referralCode);
                     }
                     
@@ -164,48 +163,39 @@
             }
         }
 
-        // Funkcija za provjeru referral koda
         async function checkReferral(referralCode) {
             const userCollection = collection(db, 'network');
             const q = query(userCollection, where("username", "==", referralCode));
             const querySnapshot = await getDocs(q);
 
             if (!querySnapshot.empty) {
-                // Ako pronađemo korisnika koji odgovara referralCode-u
                 querySnapshot.forEach(async doc => {
-                    const referralOwnerId = doc.id; // ID korisnika kojem je iskorišten referral kod
+                    const referralOwnerId = doc.id;
                     const referralOwnerData = doc.data();
-                    const referralCount = referralOwnerData.referralCount || 0; // Broj puta kada je referral kod iskorišten
+                    const referralCount = referralOwnerData.referralCount || 0;
+                    const usedByUser = referralOwnerData.usedBy || [];
 
-                    // Provjera da li je trenutni korisnik već iskoristio referral kod
-                    const usedByUser = referralOwnerData.usedBy || []; // Lista korisnika koji su već iskoristili referral kod
-                    
                     if (usedByUser.includes(userId)) {
-                        // Korisnik je već iskoristio referral kod, nema potrebe za dodavanjem bonusa
                         console.log(`Korisnik ${userId} je već iskoristio referral kod.`);
                     } else if (referralCount >= MAX_REFERRALS) {
                         console.log(`Referral kod od korisnika ${referralOwnerData.username} je već iskorišten maksimalno puta.`);
                     } else {
-                        // Dodavanje bonusa postojećem korisniku
-                        const newReferralBonus = 0.01 * (referralCount + 1); // Dodajemo 0.01 za svakog novog korisnika
+                        const newReferralBonus = 0.01 * (referralCount + 1);
 
                         console.log(`Referral nagrada dodana korisniku ${referralOwnerData.username}, bonus: ${newReferralBonus}`);
 
-                        // Ažuriraj korisnički dokument u Firestore-u
                         await updateDoc(doc.ref, {
-                            referralBonus: 0.01 + newReferralBonus, // Ažuriramo bonus korisniku
-                            referralCount: referralCount + 1, // Povećavamo broj korištenja referral koda
-                            usedBy: [...usedByUser, userId] // Dodajemo trenutnog korisnika u listu iskorištenih
+                            referralBonus: 0.01 + newReferralBonus,
+                            referralCount: referralCount + 1,
+                            usedBy: [...usedByUser, userId]
                         });
 
-                        // Ažuriramo prikaz broja referral count za korisnika kojem je iskorišten kod
                         document.getElementById('referral-count').innerText = `${referralCount + 1}/${MAX_REFERRALS}`;
                     }
                 });
             }
         }
 
-        // Funkcija za učitavanje podataka trenutnog korisnika (npr. "Bambi")
         async function loadUserData() {
             const docRef = doc(db, 'network', userId);
             const docSnap = await getDoc(docRef);
@@ -213,9 +203,8 @@
             if (docSnap.exists()) {
                 currentPrice = docSnap.data().currentPrice || 0.00;
                 lastClickTime = docSnap.data().lastClickTime ? docSnap.data().lastClickTime.toDate() : null;
-                const userReferralBonus = docSnap.data().referralBonus || 0.01; // Po defaultu, 0.01 ako nema referral bonusa
+                const userReferralBonus = docSnap.data().referralBonus || 0.01;
 
-                // Prikazivanje cijene
                 document.getElementById('current-price').querySelector('#amount').innerText = currentPrice.toFixed(2);
                 document.querySelector('.amount').innerText = (currentPrice > 0) ? userReferralBonus + "/h" : "0.00/h";
 
@@ -225,7 +214,7 @@
                 if (lastClickTime) {
                     const elapsed = now - lastClickTime;
                     const increments = Math.floor(elapsed / 5000);
-                    currentPrice += increments * userReferralBonus; // Koristimo referralBonus za povećanje cijene
+                    currentPrice += increments * userReferralBonus;
                     document.getElementById('amount').innerText = currentPrice.toFixed(2);
                     lastClickTime.setSeconds(lastClickTime.getSeconds() + increments * 5);
                     await updateFirestore(currentPrice, lastClickTime);
@@ -236,7 +225,7 @@
 
                     if (!lastClickTime || (now - lastClickTime) >= twentyFourHours) {
                         lastClickTime = now;
-                        currentPrice += userReferralBonus; // Povećanje cijene po stopi bonusa
+                        currentPrice += userReferralBonus;
                         document.querySelector('.amount').innerText = userReferralBonus + "/h";
                         await updateFirestore(currentPrice, lastClickTime);
                     } else {
@@ -248,7 +237,6 @@
             }
         }
 
-        // Funkcija za ažuriranje Firestore-a
         async function updateFirestore(currentPrice, lastClickTime) {
             const docRef = doc(db, 'network', userId);
             try {
@@ -262,19 +250,17 @@
             }
         }
 
-        // Kada se stranica učita, pozovite loadUserId
         window.onload = () => {
             loadUserId();
-
-            // Postavite interval za učitavanje podataka svakih 5 sekundi
             setInterval(() => {
-                loadUserData(); // Učitava nove podatke
+                loadUserData();
             }, 5000);
         };
     </script>
 
 </body>
 </html>
+
 
 
 
