@@ -272,9 +272,36 @@
         margin: 0;
         padding: 0;
         background-color: black;
+        
        
     }
    
+
+    @media (max-width: 768px) {
+    html, body {
+        width: 100%;
+        overflow-x: hidden; /* Onemogućava horizontalno pomjeranje */
+        margin: 0; /* Uklanja podrazumijevane margine */
+        padding: 0; /* Uklanja podrazumijevane paddinge */
+    }
+
+    /* Osiguraj da svi kontejneri i elementi imaju odgovarajuću širinu */
+    * {
+        max-width: 100%; /* Ograničava širinu na 100% */
+        box-sizing: border-box; /* Uključuje padding i border u ukupnu širinu */
+    }
+
+    img {
+        max-width: 100%; /* Održava slike unutar širine kontejnera */
+        height: auto; /* Održava odnos slike */
+    }
+
+    /* Podesi širinu specifičnih elemenata ako je potrebno */
+    .some-element { /* Zameniti sa stvarnim klasama */
+        width: 100%; /* Ili odgovarajući procenat */
+    }
+}
+
     .background {
             position: absolute;
             width: 100%;
@@ -295,13 +322,14 @@
 
 .purple {
     background: linear-gradient(to top left, rgba(128, 0, 128, 0.6), rgba(0, 0, 0, 0) 50%);
-    position: fixed; /* Promijenjeno na fixed */
+    position: fixed; /* Changed to fixed to always stick to the bottom-right */
     bottom: 0;
     right: 0;
     width: 50%;
     height: 50%;
-    z-index: -1; /* Osigurava da pozadina bude ispod ostalog sadržaja */
+    z-index: 1; /* Make sure it stays below other content if necessary */
 }
+
 
 
         
