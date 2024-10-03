@@ -41,6 +41,7 @@
             <a href="#"><span class="material-icons">group</span> Team</a>
             <a href="#"><span class="material-icons">chat</span> Chat</a>
             <a href="#"><span class="material-icons">person</span> Profile</a>
+            
         </nav>
     </header>
 
@@ -57,6 +58,7 @@
             }
         });
     </script>
+
 
 
     <div class="container">
@@ -99,13 +101,16 @@
             If your company is interested in partnering with Delta or you’d like to introduce a business to partner with Delta, tap “Partnerships” to explore how and why.
         </p>
         <div style="text-align: center; margin-top: 20px;">
-            <img src="images/ape1.png" alt="Ape Image" style="max-width: 340px; height: auto;"> <!-- Povećana širina slike -->
+            <img src="images/ape1.png" alt="Ape Image" > <!-- Povećana širina slike -->
             <div style="margin-top: 10px;"> <!-- Razmak između slike i linka -->
                 <a href="https://opensea.io/assets/matic/0x7cf95044bdf590da80691f418af11418a214eba8/3157" target="_blank" style="color: #5a99cd; text-decoration: underline;">View on OpenSea</a>
             </div>
         </div>
     </div>
     
+
+
+
 
     <div class="partnership-box">
         <p>
@@ -478,6 +483,20 @@
         text-indent: 0; /* nema uvlačenja prve linije */
         line-height: 1.6; /* povećava razmak između redova */
     }
+
+    .partnership-box img {
+    width: 100%; /* Postavi osnovnu širinu na 100% da se prilagođava */
+    max-width: 600px; /* Maksimalna širina za desktop */
+    height: auto; /* Automatsko prilagođavanje visine */
+}
+
+/* Za mobilne uređaje */
+@media only screen and (max-width: 768px) {
+    .partnership-box img {
+        max-width: 350px; /* Maksimalna širina za mobitele */
+    }
+}
+
 </style>
 
 
@@ -566,7 +585,7 @@
 @media (max-width: 768px) {
     .image-container {
         align-items: flex-start; /* Gornji dio */
-        transform: translateY(50px); /* Pomakni prema dolje na mobilnim uređajima */
+        transform: translateY(30px); /* Pomakni prema dolje na mobilnim uređajima */
     }
 }
 
