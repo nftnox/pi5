@@ -17,6 +17,120 @@
         #referral-info .material-icons {
             margin-right: 5px;
         }
+
+        /* Chat modal, smješten u donji desni ugao za desktop, full screen za mobilne uređaje */
+        #chat-modal {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 400px;
+            background-color: white;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            z-index: 1000;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (max-width: 600px) {
+            #chat-modal {
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+            }
+        }
+
+        /* Gornji dio sa X dugmetom za zatvaranje */
+        #chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #5a99cd;
+            color: white;
+        }
+
+        #close-chat {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: white;
+            cursor: pointer;
+        }
+
+        #chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* Poruke u chat prozoru */
+        #messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .message img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .message .message-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message .username {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 3px;
+        }
+
+        .message-content {
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 200px;
+        }
+
+        /* Donji dio s unosom poruke i slanja */
+        #message-input {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        #message-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #message-input button {
+            padding: 10px;
+            background-color: #5a99cd;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -31,7 +145,7 @@
         <nav id="desktop-menu"> <!-- Desktop meni -->
             <a href="#"><span class="material-icons">home</span> Home</a>
             <a href="#"><span class="material-icons">group</span> Team</a>
-            <a href="#"><span class="material-icons">chat</span> Chat</a>
+            <a href="#" id="chat-link"><span class="material-icons">chat</span> Chat</a>
             <a href="#"><span class="material-icons">person</span> Profile</a>
         </nav>
     
@@ -39,9 +153,8 @@
         <nav id="toggle-menu">
             <a href="#"><span class="material-icons">home</span> Home</a>
             <a href="#"><span class="material-icons">group</span> Team</a>
-            <a href="#"><span class="material-icons">chat</span> Chat</a>
+            <a href="#" id="chat-link"><span class="material-icons">chat</span> Chat</a>
             <a href="#"><span class="material-icons">person</span> Profile</a>
-            
         </nav>
     </header>
 
@@ -59,7 +172,20 @@
         });
     </script>
 
-
+    <!-- Chat modal -->
+    <div id="chat-modal">
+        <div id="chat-box">
+            <div id="chat-header">
+                <h3>Chat Room</h3>
+                <button id="close-chat">✖</button>
+            </div>
+            <div id="messages"></div>
+            <div id="message-input">
+                <input type="text" id="chat-message" placeholder="Unesite poruku...">
+                <button id="send-message">Pošalji</button>
+            </div>
+        </div>
+    </div>
 
     <div class="container">
         <div class="icon-section">
@@ -85,7 +211,6 @@
         <img src="images/delta.png" alt="Delta Image" style="max-width: 100%; height: auto;">
     </div>
 
-
     <div class="partnership-box">
         <p>
             Delta coin is selecting partnerships with crypto-services and general businesses ahead of our Open Network launch. 
@@ -93,34 +218,6 @@
             If your company is interested in partnering with Delta or you’d like to introduce a business to partner with Delta, tap “Partnerships” to explore how and why.
         </p>
     </div>
-
-    <div class="partnership-box">
-        <p>
-            Delta coin is selecting partnerships with crypto-services and general businesses ahead of our Open Network launch. 
-            This is a unique, early opportunity for businesses to connect with over 10 million engaged Delta coin fans and become part of Delta’s rapidly expanding Web3 ecosystem. 
-            If your company is interested in partnering with Delta or you’d like to introduce a business to partner with Delta, tap “Partnerships” to explore how and why.
-        </p>
-        <div style="text-align: center; margin-top: 20px;">
-            <img src="images/ape1.png" alt="Ape Image" > <!-- Povećana širina slike -->
-            <div style="margin-top: 10px;"> <!-- Razmak između slike i linka -->
-                <a href="https://opensea.io/assets/matic/0x7cf95044bdf590da80691f418af11418a214eba8/3157" target="_blank" style="color: #5a99cd; text-decoration: underline;">View on OpenSea</a>
-            </div>
-        </div>
-    </div>
-    
-
-
-
-
-    <div class="partnership-box">
-        <p>
-            Delta coin is selecting partnerships with crypto-services and general businesses ahead of our Open Network launch. 
-            This is a unique, early opportunity for businesses to connect with over 10 million engaged Delta coin fans and become part of Delta’s rapidly expanding Web3 ecosystem. 
-            If your company is interested in partnering with Delta or you’d like to introduce a business to partner with Delta, tap “Partnerships” to explore how and why.
-        </p>
-    </div>
-
-
 
     <div class="background blue"></div>
     <div class="background purple"></div>
@@ -159,7 +256,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, doc, getDoc, updateDoc, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBKfTE0qZdxVLq0lvmli367_yyqpGK-fPA",
@@ -174,7 +271,8 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        let userId = ""; // ID trenutnog korisnika (npr. "Bambi")
+        let userId = ""; // ID trenutnog korisnika
+        let username = ""; // Pravi username korisnika
         let currentPrice = 0.00; // Trenutna cijena korisnika
         let lastClickTime = null; // Vrijeme posljednjeg klika
         let referralBonus = 0.01; // Početni bonus za novog korisnika (0.01 za 5 sekundi)
@@ -190,7 +288,8 @@
                 querySnapshot.forEach(doc => {
                     userId = doc.id; // Dobijanje ID-a korisnika
                     const userData = doc.data();
-                    document.getElementById('ime').innerText = userData.ime; // Prikazivanje imena korisnika
+                    username = userData.ime; // Dobijanje stvarnog imena korisnika
+                    document.getElementById('ime').innerText = username; // Prikazivanje imena korisnika
                     
                     if (userData.referralCode) {
                         checkReferral(userData.referralCode);
@@ -290,6 +389,84 @@
             }
         }
 
+        // Chat funkcionalnost
+
+        const chatModal = document.getElementById('chat-modal');
+        const chatLink = document.getElementById('chat-link');
+        const closeChat = document.getElementById('close-chat');
+        const sendMessageButton = document.getElementById('send-message');
+        const messagesContainer = document.getElementById('messages');
+        const chatMessageInput = document.getElementById('chat-message');
+
+        // Prikaži chat prozor kada se klikne na "Chat"
+        chatLink.addEventListener('click', () => {
+            chatModal.style.display = 'flex';
+        });
+
+        // Zatvori chat prozor kad klikneš na "X"
+        closeChat.addEventListener('click', () => {
+            chatModal.style.display = 'none';
+        });
+
+        // Funkcija za slanje poruke
+        async function sendMessage(messageText) {
+            try {
+                await addDoc(collection(db, 'messages'), {
+                    username: username, // Dinamičko ime korisnika
+                    message: messageText,
+                    timestamp: new Date()
+                });
+                chatMessageInput.value = ''; // Očisti polje za unos poruke
+            } catch (error) {
+                console.error("Greška prilikom slanja poruke: ", error);
+            }
+        }
+
+        // Kada kliknemo na dugme "Pošalji"
+        sendMessageButton.addEventListener('click', () => {
+            const messageText = chatMessageInput.value.trim();
+            if (messageText) {
+                sendMessage(messageText);
+            } else {
+                console.log("Poruka ne može biti prazna.");
+            }
+        });
+
+        // Prikazivanje poruka u stvarnom vremenu
+        onSnapshot(collection(db, 'messages'), (snapshot) => {
+            messagesContainer.innerHTML = ''; // Očisti stare poruke
+            snapshot.forEach((doc) => {
+                const messageData = doc.data();
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+
+                // Dodaj statičnu sivu profilnu sliku
+                const userImage = document.createElement('img');
+                userImage.src = 'https://via.placeholder.com/40/cccccc/ffffff?text=P'; // Siva ikona za profil
+                messageElement.appendChild(userImage);
+
+                const messageDetails = document.createElement('div');
+                messageDetails.classList.add('message-details');
+
+                // Prikaz korisničkog imena
+                const usernameElement = document.createElement('div');
+                usernameElement.classList.add('username');
+                usernameElement.textContent = messageData.username;
+
+                // Tekst poruke
+                const contentElement = document.createElement('div');
+                contentElement.classList.add('message-content');
+                contentElement.textContent = messageData.message;
+
+                messageDetails.appendChild(usernameElement);
+                messageDetails.appendChild(contentElement);
+
+                messageElement.appendChild(messageDetails);
+                messagesContainer.appendChild(messageElement);
+            });
+            messagesContainer.scrollTop = messagesContainer.scrollHeight; // Automatsko skrolanje na dno
+        });
+
         window.onload = () => {
             loadUserId();
             setInterval(() => {
@@ -300,6 +477,7 @@
 
 </body>
 </html>
+
 
 
 
