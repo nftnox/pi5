@@ -25,7 +25,7 @@
             bottom: 20px;
             right: 20px;
             width: 350px;
-            height: 400px;
+            height: 600px;
             background-color: white;
             border: 1px solid #ccc;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
@@ -35,15 +35,7 @@
             overflow: hidden;
         }
 
-        @media (max-width: 600px) {
-            #chat-modal {
-                width: 100%;
-                height: 100%;
-                bottom: 0;
-                right: 0;
-                border-radius: 0;
-            }
-        }
+       
 
         /* Gornji dio sa X dugmetom za zatvaranje */
         #chat-header {
@@ -83,9 +75,37 @@
             margin-bottom: 10px;
         }
 
+/* Poruke korisnika koji je prijavljen */
+.my-message {
+    justify-content: flex-end; /* Poruke korisnika su s desne strane */
+}
+
+.other-message {
+    justify-content: flex-start; /* Poruke drugih korisnika su s leve strane */
+}
+
+/* Stil za korisničke poruke koje sadrže tekst */
+.my-message .message-content {
+    background-color: #5a99cd; /* Različita pozadina za korisničke poruke */
+    color: white; /* Bele boje za tekst */
+}
+
+/* Stil za korisničke poruke koje sadrže slike */
+.my-message .message-content.no-background {
+    background-color: transparent; /* Bez pozadine kada slika postoji */
+    color: inherit; /* Nasljedite boju teksta (neka bude ista kao ostatak poruka) */
+}
+
+
+/* Stilovi za poruke drugih korisnika */
+.other-message .message-content {
+    background-color: #f1f1f1; /* Svetla pozadina za poruke drugih korisnika */
+}
+
+
         .message img {
-            width: 40px;
-            height: 40px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             margin-right: 10px;
         }
@@ -131,6 +151,8 @@
             cursor: pointer;
         }
 
+       
+
     </style>
 </head>
 <body>
@@ -173,19 +195,32 @@
     </script>
 
     <!-- Chat modal -->
-    <div id="chat-modal">
-        <div id="chat-box">
-            <div id="chat-header">
-                <h3>Chat Room</h3>
-                <button id="close-chat">✖</button>
-            </div>
-            <div id="messages"></div>
-            <div id="message-input">
-                <input type="text" id="chat-message" placeholder="Unesite poruku...">
-                <button id="send-message">Pošalji</button>
-            </div>
+<div id="chat-modal">
+    <div id="chat-box">
+        <div id="chat-header">
+            <h3>Chat Room</h3>
+            <button id="close-chat">✖</button>
+        </div>
+        <div id="messages"></div>
+        <div id="message-input">
+            <input type="file" id="image-upload" accept="image/*" style="display: none;">
+            <button id="add-image">+</button>
+            <input type="text" id="chat-message" placeholder="Unesite poruku...">
+            <button id="send-message">Pošalji</button>
         </div>
     </div>
+</div>
+
+<!-- Fullscreen image modal -->
+<div id="fullscreen-image-modal" style="display: none;">
+    <div id="fullscreen-image-container">
+        <img id="fullscreen-image" src="" alt="Uploaded Image">
+        <button id="close-fullscreen">X</button>
+    </div>
+</div>
+
+
+
 
     <div class="container">
         <div class="icon-section">
@@ -392,80 +427,165 @@
         // Chat funkcionalnost
 
         const chatModal = document.getElementById('chat-modal');
-        const chatLink = document.getElementById('chat-link');
-        const closeChat = document.getElementById('close-chat');
-        const sendMessageButton = document.getElementById('send-message');
-        const messagesContainer = document.getElementById('messages');
-        const chatMessageInput = document.getElementById('chat-message');
+const chatLink = document.getElementById('chat-link');
+const closeChat = document.getElementById('close-chat');
+const sendMessageButton = document.getElementById('send-message');
+const messagesContainer = document.getElementById('messages');
+const chatMessageInput = document.getElementById('chat-message');
+const addImageButton = document.getElementById('add-image');
+const imageUploadInput = document.getElementById('image-upload'); // File input za sliku
 
-        // Prikaži chat prozor kada se klikne na "Chat"
-        chatLink.addEventListener('click', () => {
-            chatModal.style.display = 'flex';
+// Prikaži chat prozor kada se klikne na "Chat"
+chatLink.addEventListener('click', () => {
+    chatModal.style.display = 'flex';
+});
+
+// Zatvori chat prozor kad klikneš na "X"
+closeChat.addEventListener('click', () => {
+    chatModal.style.display = 'none';
+});
+
+// Funkcija za slanje poruke
+async function sendMessage(messageText, imageUrl = '') {
+    try {
+        await addDoc(collection(db, 'messages'), {
+            username: username, // Dinamičko ime korisnika
+            message: messageText,
+            imageUrl: imageUrl, // Dodaj sliku u poruku
+            timestamp: new Date()
         });
+        chatMessageInput.value = ''; // Očisti polje za unos poruke
+    } catch (error) {
+        console.error("Greška prilikom slanja poruke: ", error);
+    }
+}
 
-        // Zatvori chat prozor kad klikneš na "X"
-        closeChat.addEventListener('click', () => {
-            chatModal.style.display = 'none';
-        });
+// Kada kliknemo na dugme "Pošalji"
+sendMessageButton.addEventListener('click', () => {
+    const messageText = chatMessageInput.value.trim();
+    if (messageText) {
+        sendMessage(messageText);
+    } else {
+        console.log("Poruka ne može biti prazna.");
+    }
+});
 
-        // Funkcija za slanje poruke
-        async function sendMessage(messageText) {
-            try {
-                await addDoc(collection(db, 'messages'), {
-                    username: username, // Dinamičko ime korisnika
-                    message: messageText,
-                    timestamp: new Date()
-                });
-                chatMessageInput.value = ''; // Očisti polje za unos poruke
-            } catch (error) {
-                console.error("Greška prilikom slanja poruke: ", error);
-            }
+// Dodavanje funkcionalnosti za dugme "+"
+addImageButton.addEventListener('click', () => {
+    imageUploadInput.click(); // Klikni na skriveni input za upload slike
+});
+
+// Obradi upload slike i prikaži je u chatu
+imageUploadInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0]; // Dobij odabranu sliku
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = async (e) => {
+            const imageUrl = e.target.result; // Učitani URL slike
+
+            // Spremi sliku u Firestore
+            await sendMessage('', imageUrl); // Pošaljemo praznu poruku i URL slike
+
+            // Očisti input za sliku
+            imageUploadInput.value = ''; // Očisti input za upload
+        };
+
+        reader.readAsDataURL(file); // Učitaj sliku kao base64 URL
+    }
+});
+
+// Prikazivanje poruka u stvarnom vremenu
+onSnapshot(collection(db, 'messages'), (snapshot) => {
+    const messagesArray = []; // Kreiraj niz poruka
+
+    snapshot.forEach((doc) => {
+        const messageData = doc.data();
+        messagesArray.push(messageData); // Dodaj poruke u niz
+    });
+
+    // Sortiraj poruke po timestampu
+    messagesArray.sort((a, b) => a.timestamp - b.timestamp);
+
+    messagesContainer.innerHTML = ''; // Očisti stare poruke
+
+    // Prikaz poruka
+    messagesArray.forEach((messageData) => {
+        const messageElement = document.createElement('div');
+
+        // Proverite da li je korisnik poslao poruku
+        if (messageData.username === username) { // username je ime prijavljenog korisnika
+            messageElement.classList.add('message', 'my-message'); // Poruka korisnika
+        } else {
+            messageElement.classList.add('message', 'other-message'); // Poruka drugih korisnika
         }
 
-        // Kada kliknemo na dugme "Pošalji"
-        sendMessageButton.addEventListener('click', () => {
-            const messageText = chatMessageInput.value.trim();
-            if (messageText) {
-                sendMessage(messageText);
-            } else {
-                console.log("Poruka ne može biti prazna.");
-            }
-        });
+        // Dodaj statičnu sivu profilnu sliku  messageElement.appendChild(userImage);             OVAJ SREDNJI DIO SE DODAJE AKO ZELIM SLIKU
+        const userImage = document.createElement('img');
+      
+        
+        const messageDetails = document.createElement('div');
+        messageDetails.classList.add('message-details');
 
-        // Prikazivanje poruka u stvarnom vremenu
-        onSnapshot(collection(db, 'messages'), (snapshot) => {
-            messagesContainer.innerHTML = ''; // Očisti stare poruke
-            snapshot.forEach((doc) => {
-                const messageData = doc.data();
-                const messageElement = document.createElement('div');
-                messageElement.classList.add('message');
+        // Prikaz korisničkog imena
+        const usernameElement = document.createElement('div');
+        usernameElement.classList.add('username');
+        usernameElement.textContent = messageData.username;
 
-                // Dodaj statičnu sivu profilnu sliku
-                const userImage = document.createElement('img');
-                userImage.src = 'https://via.placeholder.com/40/cccccc/ffffff?text=P'; // Siva ikona za profil
-                messageElement.appendChild(userImage);
+        // Tekst poruke
+        const contentElement = document.createElement('div');
+        contentElement.classList.add('message-content');
+        contentElement.textContent = messageData.message;
 
-                const messageDetails = document.createElement('div');
-                messageDetails.classList.add('message-details');
 
-                // Prikaz korisničkog imena
-                const usernameElement = document.createElement('div');
-                usernameElement.classList.add('username');
-                usernameElement.textContent = messageData.username;
+  // Dodaj klasu no-background ako poruka ne sadrži tekst
+  if (messageData.message) {
+        contentElement.textContent = messageData.message;
+    } else {
+        contentElement.classList.add('no-background'); // Dodaj klasu ako je slika prisutna
+    }
 
-                // Tekst poruke
-                const contentElement = document.createElement('div');
-                contentElement.classList.add('message-content');
-                contentElement.textContent = messageData.message;
+        messageDetails.appendChild(usernameElement);
+        messageDetails.appendChild(contentElement);
 
-                messageDetails.appendChild(usernameElement);
-                messageDetails.appendChild(contentElement);
+        // Prikaz slike ako postoji
+        if (messageData.imageUrl) {
+            const imageElement = document.createElement('img');
+            imageElement.src = messageData.imageUrl; // Postavi src na učitani URL slike
+            imageElement.classList.add('chat-image'); // Dodaj klasu za stilizaciju slike
+            messageElement.appendChild(imageElement);
+        }
 
-                messageElement.appendChild(messageDetails);
-                messagesContainer.appendChild(messageElement);
-            });
-            messagesContainer.scrollTop = messagesContainer.scrollHeight; // Automatsko skrolanje na dno
-        });
+        messageElement.appendChild(messageDetails);
+        messagesContainer.appendChild(messageElement);
+    });
+
+    messagesContainer.scrollTop = messagesContainer.scrollHeight; // Automatsko skrolanje na dno
+});
+
+// Dodaj ovu funkciju da zatvori toggle meni
+function closeToggleMenu() {
+    const toggleMenu = document.getElementById('toggle-menu');
+    toggleMenu.style.display = 'none'; // Skrivenje toggle menija
+}
+
+// Prikaži chat prozor kada se klikne na "Chat"
+chatLink.addEventListener('click', () => {
+    chatModal.style.display = 'flex';
+    closeToggleMenu(); // Zatvori meni nakon otvaranja chata
+});
+
+// Dodaj ovu funkciju na mobilnom meniju da otvori chat
+const mobileChatLink = document.querySelector('#toggle-menu a#chat-link');
+mobileChatLink.addEventListener('click', () => {
+    chatModal.style.display = 'flex';
+    closeToggleMenu(); // Zatvori meni nakon otvaranja chata
+});
+
+
+
+
+
 
         window.onload = () => {
             loadUserId();
