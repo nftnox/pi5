@@ -9,11 +9,22 @@
     
     <style>
 
-        input,
-textarea {
-    touch-action: manipulation; /* Omogućava manipulaciju bez zumiranja */
-    
+     /* Stilovi za mobilne uređaje */
+@media (max-width: 768px) {
+    html {
+        touch-action: manipulation; /* Sprečava zoomiranje kada se dodirne */
+    }
+
+    input,
+    textarea {
+       
+        touch-action: manipulation; /* Sprečava zoomiranje kada se dodirne */
+        -webkit-user-select: none; /* Onemogućava selektovanje teksta */
+        -moz-user-select: none; /* Onemogućava selektovanje teksta */
+        -ms-user-select: none; /* Onemogućava selektovanje teksta */
+    }
 }
+
 
         
         /* Osigurajmo da se #referral-info prikazuje */
